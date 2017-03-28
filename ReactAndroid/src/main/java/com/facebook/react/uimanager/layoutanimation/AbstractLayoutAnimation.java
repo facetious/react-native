@@ -48,11 +48,13 @@ import com.facebook.react.uimanager.IllegalViewOperationException;
 
   protected @Nullable AnimatedPropertyType mAnimatedProperty;
   protected int mDurationMs;
+  protected double mAnimatedParam;
 
   public void reset() {
     mAnimatedProperty = null;
     mDurationMs = 0;
     mDelayMs = 0;
+    mAnimatedParam = 0;
     mInterpolator = null;
   }
 
@@ -61,6 +63,7 @@ import com.facebook.react.uimanager.IllegalViewOperationException;
         AnimatedPropertyType.fromString(data.getString("property")) : null;
     mDurationMs = data.hasKey("duration") ? data.getInt("duration") : globalDuration;
     mDelayMs = data.hasKey("delay") ? data.getInt("delay") : 0;
+    mAnimatedParam = data.hasKey("param") ? data.getDouble("param") : 0;
     if (!data.hasKey("type")) {
       throw new IllegalArgumentException("Missing interpolation type.");
     }

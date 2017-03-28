@@ -5,6 +5,7 @@ package com.facebook.react.uimanager.layoutanimation;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
+import android.view.animation.TranslateAnimation;
 
 import com.facebook.react.uimanager.IllegalViewOperationException;
 
@@ -41,6 +42,15 @@ import com.facebook.react.uimanager.IllegalViewOperationException;
               .5f,
               Animation.RELATIVE_TO_SELF,
               .5f);
+        }
+        case TRANSFORM_X: {
+          float fromValue = isReverse() ? 0.0f : mAnimatedParam;
+          float toValue = isReverse() ? mAnimatedParam : 0.0f;
+          return new TranslateAnimation(
+              fromValue,
+              toValue,
+              0.0f,
+              0.0f);
         }
         default:
           throw new IllegalViewOperationException(

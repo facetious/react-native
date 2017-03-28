@@ -31,6 +31,7 @@ var Types = keyMirror(TypesEnum);
 var PropertiesEnum = {
   opacity: true,
   scaleXY: true,
+  translateX: true,
 };
 var Properties = keyMirror(PropertiesEnum);
 
@@ -45,6 +46,7 @@ var animType = PropTypes.shape({
   property: PropTypes.oneOf( // Only applies to create/delete
     Object.keys(Properties)
   ),
+  param: PropTypes.number,
 });
 
 type Anim = {
@@ -54,6 +56,7 @@ type Anim = {
   initialVelocity?: number,
   type?: $Enum<typeof TypesEnum>,
   property?: $Enum<typeof PropertiesEnum>,
+  param?: number,
 }
 
 var configType = PropTypes.shape({

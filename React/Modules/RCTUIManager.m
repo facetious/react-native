@@ -62,6 +62,7 @@ NSString *const RCTUIManagerRootViewKey = @"RCTUIManagerRootViewKey";
 @property (nonatomic, readonly) CGFloat springDamping;
 @property (nonatomic, readonly) CGFloat initialVelocity;
 @property (nonatomic, readonly) RCTAnimationType animationType;
+@property (nonatomic, readonly) CGFloat param;
 
 @end
 
@@ -140,6 +141,7 @@ static UIViewAnimationOptions UIViewAnimationOptionsFromRCTAnimationType(RCTAnim
       _springDamping = [RCTConvert CGFloat:config[@"springDamping"]];
       _initialVelocity = [RCTConvert CGFloat:config[@"initialVelocity"]];
     }
+    _param = [RCTConvert CGFloat:config[@"param"]];
   }
   return self;
 }
@@ -651,12 +653,17 @@ dispatch_queue_t RCTGetUIManagerQueue(void)
 
         CATransform3D finalTransform = view.layer.transform;
         CGFloat finalOpacity = view.layer.opacity;
+        CGPoint finalPos = view.layer.position;
 
         NSString *property = createAnimation.property;
         if ([property isEqualToString:@"scaleXY"]) {
           view.layer.transform = CATransform3DMakeScale(0, 0, 0);
         } else if ([property isEqualToString:@"opacity"]) {
           view.layer.opacity = 0.0;
+        } else if ([property isEqualToString:@"translateX"]) {
+          CGPoint pos = view.layer.position;
+          pos.x += createAnimation.param;
+          view.layer.position = pos;
         } else {
           RCTLogError(@"Unsupported layout animation createConfig property %@",
                       createAnimation.property);
@@ -667,6 +674,8 @@ dispatch_queue_t RCTGetUIManagerQueue(void)
             view.layer.transform = finalTransform;
           } else if ([property isEqualToString:@"opacity"]) {
             view.layer.opacity = finalOpacity;
+          } else if ([property isEqualToString:@"translateX"]) {
+            view.layer.position = finalPos;
           }
           if (updateBlock) {
             updateBlock(self, viewRegistry);
@@ -829,6 +838,10 @@ RCT_EXPORT_METHOD(removeSubviewsFromContainerWithID:(nonnull NSNumber *)containe
         removedChild.layer.transform = CATransform3DMakeScale(0.001, 0.001, 0.001);
       } else if ([property isEqualToString:@"opacity"]) {
         removedChild.layer.opacity = 0.0;
+      } else if ([property isEqualToString:@"translateX"]) {
+        CGPoint pos = removedChild.layer.position;
+        pos.x += deleteAnimation.param;
+        removedChild.layer.position = pos;
       } else {
         RCTLogError(@"Unsupported layout animation createConfig property %@",
                     deleteAnimation.property);
@@ -987,12 +1000,9 @@ RCT_EXPORT_METHOD(manageChildren:(nonnull NSNumber *)containerTag
     // When performing a delete animation, views are not removed immediately
     // from their container so we need to offset the insertion index if a view
     // that will be removed appears earlier than the view we are inserting.
-    if (isUIViewRegistry && _viewsToBeDeleted.count > 0) {
-      for (NSInteger index = 0; index < insertAtIndex; index++) {
-        UIView *subview = ((UIView *)container).reactSubviews[index];
-        if ([_viewsToBeDeleted containsObject:subview]) {
-          insertAtIndex++;
-        }
+    if (isUIViewRegistry && removeAtIndices.count > 0) {
+      if ([removeAtIndices containsObject:reactIndex]) {
+        insertAtIndex++;
       }
     }
 

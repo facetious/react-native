@@ -8,7 +8,8 @@ package com.facebook.react.uimanager.layoutanimation;
  */
 /* package */ enum AnimatedPropertyType {
   OPACITY("opacity"),
-  SCALE_XY("scaleXY");
+  SCALE_XY("scaleXY"),
+  TRANSATE_X("translateX");
 
   private final String mName;
 
